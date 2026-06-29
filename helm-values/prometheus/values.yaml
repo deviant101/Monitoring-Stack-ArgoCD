@@ -1,0 +1,44 @@
+# Kept deliberately small; the chart's default scrape config already discovers
+# pods carrying prometheus.io/scrape annotations (used by pulse).
+
+server:
+  retention: "15d"
+  # persistentVolume:
+  #   enabled: true
+  #   size: 8Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  # Native Gateway API HTTPRoute support (the prometheus chart's server.route map).
+  # SECURITY: Prometheus has NO built-in auth and the Gateway is internet-facing,
+  # so this is disabled by default — enabling it makes all metrics/targets
+  # world-readable. Turn `enabled: true` only behind an auth proxy or an
+  # internal Gateway.
+  route:
+    main:
+      enabled: false
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
+      hostnames:
+        - prometheus.rancher.live
+      parentRefs:
+        - name: cilium-gateway
+          namespace: demo-gateway
+          sectionName: https
+
+alertmanager:
+  enabled: false
+
+prometheus-pushgateway:
+  enabled: false
+
+# prometheus-node-exporter:
+#   enabled: true
+
+# kube-state-metrics:
+#   enabled: true

@@ -1,0 +1,24 @@
+# The bitnami/wordpress chart has no native Gateway API support, so the route
+# is a plain manifest here, synced by the wordpress ArgoCD Application as an
+# extra directory source. Lives in the wordpress namespace alongside the
+# Service it targets (Gateway API requires namespace-local backendRefs).
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: wordpress
+  namespace: wordpress
+spec:
+  parentRefs:
+    - name: cilium-gateway
+      namespace: demo-gateway
+      sectionName: https
+  hostnames:
+    - wordpress.rancher.live
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: wordpress
+          port: 80

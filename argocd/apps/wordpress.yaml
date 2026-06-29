@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wordpress
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://charts.bitnami.com/bitnami
+      chart: wordpress
+      targetRevision: 23.1.28
+      helm:
+        valueFiles:
+          - $values/helm-values/wordpress/values.yaml
+    - repoURL: https://github.com/deviant101/Monitoring-Stack-ArgoCD.git
+      targetRevision: main
+      ref: values
+    # Extra source: the plain HTTPRoute manifest (bitnami has no native support).
+    - repoURL: https://github.com/deviant101/Monitoring-Stack-ArgoCD.git
+      targetRevision: main
+      path: manifests/wordpress
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: wordpress
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

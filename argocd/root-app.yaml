@@ -1,0 +1,27 @@
+# App-of-apps root. Apply this once; ArgoCD then manages the four child
+# Application manifests under argocd/apps/ from Git. Uses the built-in
+# `default` project (no custom AppProject).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/deviant101/Monitoring-Stack-ArgoCD.git
+    targetRevision: main
+    path: argocd/apps
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

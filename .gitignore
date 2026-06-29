@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+pulse/.venv/
+
+# Helm
+*.tgz
+charts/
+
+# Local
+.DS_Store

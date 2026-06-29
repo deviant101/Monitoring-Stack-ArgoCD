@@ -1,0 +1,31 @@
+wordpressUsername: admin
+wordpressPassword: "change-me"
+wordpressBlogName: "GitOps WordPress"
+
+service:
+  type: ClusterIP
+
+# Single replica with persistence is plenty for a demo stack.
+replicaCount: 1
+persistence:
+  enabled: true
+  size: 8Gi
+
+# mariadb:
+#   enabled: true
+#   primary:
+#     persistence:
+#       enabled: true
+#       size: 8Gi
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Expose basic Apache metrics for Prometheus if desired.
+# metrics:
+#   enabled: false

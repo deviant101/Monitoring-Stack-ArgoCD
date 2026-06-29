@@ -1,0 +1,72 @@
+# For production, replace this with a reference to an existing Secret via
+# admin.existingSecret. This default exists only so first boot works.
+adminUser: admin
+adminPassword: admin
+
+persistence:
+  enabled: true
+  size: 4Gi
+
+# service:
+#   type: ClusterIP
+#   port: 80
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+# Wire Prometheus in as the default datasource. The prometheus chart's server
+# Service is named "<release>-server"; with release "prometheus" in namespace
+# "monitoring" that resolves to the URL below.
+# datasources:
+#   datasources.yaml:
+#     apiVersion: 1
+#     datasources:
+#       - name: Prometheus
+#         type: prometheus
+#         access: proxy
+#         url: http://prometheus-server.monitoring.svc.cluster.local
+#         isDefault: true
+
+# Auto-load a couple of community dashboards so Grafana is useful on first boot.
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: default
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+dashboards:
+  default:
+    kubernetes-cluster:
+      gnetId: 7249
+      revision: 1
+      datasource: Prometheus
+    node-exporter:
+      gnetId: 1860
+      revision: 37
+      datasource: Prometheus
+
+# Native Gateway API HTTPRoute support (the grafana chart's `route` map).
+# `main` serves HTTPS traffic; plain HTTP to the host is not routed.
+route:
+  main:
+    enabled: true
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    hostnames:
+      - grafana.rancher.live
+    parentRefs:
+      - name: cilium-gateway
+        namespace: demo-gateway
+        sectionName: https

@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pulse
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.io
+spec:
+  project: default
+  # Local Helm chart living in this Git repo. The CI pipeline rewrites
+  # pulse/chart/values.yaml's image.tag on each build of main; because
+  # sync is automated, ArgoCD detects the Git change and rolls out the new
+  # image without any manual step.
+  source:
+    repoURL: https://github.com/deviant101/Monitoring-Stack-ArgoCD.git
+    targetRevision: main
+    path: pulse/chart
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: pulse
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
