@@ -21,7 +21,7 @@ server:
   # internal Gateway.
   route:
     main:
-      enabled: true
+      enabled: false
       apiVersion: gateway.networking.k8s.io/v1
       kind: HTTPRoute
       hostnames:
