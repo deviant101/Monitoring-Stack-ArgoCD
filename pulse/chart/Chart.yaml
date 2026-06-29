@@ -1,0 +1,8 @@
+apiVersion: v2
+name: pulse
+description: A small Go HTTP service exposing Prometheus metrics, deployed via GitOps.
+type: application
+version: 0.1.0
+# appVersion tracks the default container image tag. CI updates values.yaml's
+# image.tag on each build rather than this field.
+appVersion: "v0.1.0"

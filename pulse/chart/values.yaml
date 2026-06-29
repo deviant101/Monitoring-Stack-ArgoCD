@@ -1,0 +1,63 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/deviant101/monitoring-stack-argocd/pulse
+  # tag is rewritten automatically by the CI pipeline on every build of main.
+  # Changing this value in Git is what triggers ArgoCD to sync a new image.
+  tag: "v0.1.0"
+  pullPolicy: IfNotPresent
+
+# Pull secret for the GHCR image. Only needed if the package is private.
+# Create it once in the target namespace, e.g.:
+#   kubectl -n pulse create secret docker-registry ghcr-creds \
+#     --docker-server=ghcr.io --docker-username=USER --docker-password=$PAT
+imagePullSecrets: []
+#  - name: ghcr-creds
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+# Gateway API HTTPRoute exposing the app through an existing (Cilium) Gateway.
+# The Gateway lives in another namespace and allows routes "from: All", so the
+# route attaches cross-namespace.
+route:
+  enabled: true
+  gateway:
+    name: cilium-gateway
+    namespace: demo-gateway
+  hostname: pulse.rancher.live
+
+# Prometheus discovers this pod via annotations (the prometheus-community
+# "prometheus" chart's default kubernetes-pods scrape job honours these).
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+
+# Enable only if the Prometheus Operator CRDs are installed in the cluster
+# (e.g. kube-prometheus-stack). With the plain prometheus chart, leave false
+# and rely on the podAnnotations above.
+serviceMonitor:
+  enabled: false
+  interval: 15s
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+# Image runs as the non-root uid 65532 created in the Dockerfile.
+# readOnlyRootFilesystem is false because gunicorn needs a writable /tmp for
+# its worker heartbeat files.
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop: ["ALL"]
