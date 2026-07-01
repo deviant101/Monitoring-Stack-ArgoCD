@@ -1,9 +1,8 @@
 replicaCount: 2
 image:
   repository: ghcr.io/deviant101/monitoring-stack-argocd/pulse
-  tag: "sha-19571c5"
+  tag: "sha-af07fc8"
   pullPolicy: IfNotPresent
-
 imagePullSecrets: []
 #  - name: ghcr-creds
 
@@ -11,7 +10,6 @@ service:
   type: ClusterIP
   port: 80
   targetPort: 8080
-
 route:
   enabled: true
   gateway:
@@ -24,14 +22,12 @@ podAnnotations:
   prometheus.io/scrape: "true"
   prometheus.io/port: "8080"
   prometheus.io/path: "/metrics"
-
 # Enable only if the Prometheus Operator CRDs are installed in the cluster
 # (e.g. kube-prometheus-stack). With the plain prometheus chart, leave false
 # and rely on the podAnnotations above.
 serviceMonitor:
   enabled: false
   interval: 15s
-
 resources:
   requests:
     cpu: 25m
@@ -39,7 +35,6 @@ resources:
   limits:
     cpu: 100m
     memory: 64Mi
-
 securityContext:
   runAsNonRoot: true
   runAsUser: 65532
