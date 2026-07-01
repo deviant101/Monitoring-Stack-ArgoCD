@@ -1,6 +1,3 @@
-# Kept deliberately small; the chart's default scrape config already discovers
-# pods carrying prometheus.io/scrape annotations (used by pulse).
-
 server:
   retention: "15d"
   # persistentVolume:

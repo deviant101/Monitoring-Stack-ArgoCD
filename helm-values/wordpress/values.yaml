@@ -16,7 +16,6 @@ mariadb:
 service:
   type: ClusterIP
 
-# Single replica with persistence is plenty for a demo stack.
 replicaCount: 1
 persistence:
   enabled: true

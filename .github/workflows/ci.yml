@@ -1,11 +1,5 @@
 name: pulse CI
 
-# Build + push the custom app image, then write the new tag back into the Helm
-# values file. That Git commit is what ArgoCD reacts to (GitOps image update).
-#
-# Trigger is scoped to the app SOURCE only (not the chart) so the automated
-# values.yaml update commit does NOT re-trigger this workflow — that breaks the
-# otherwise-infinite loop.
 on:
   push:
     branches: [main]
@@ -17,8 +11,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write   # commit the updated tag back to the repo
-  packages: write   # push the image to GHCR
+  contents: write
+  packages: write
 
 jobs:
   build-push-update:
