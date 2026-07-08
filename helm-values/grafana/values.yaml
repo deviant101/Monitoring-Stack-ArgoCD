@@ -54,6 +54,11 @@ dashboards:
       gnetId: 1860
       revision: 37
       datasource: Prometheus
+    cloudnativepg:
+      gnetId: 20417
+      revision: 4
+      datasource: Prometheus
+
 
 route:
   main:
