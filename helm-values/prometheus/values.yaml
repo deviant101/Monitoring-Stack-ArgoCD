@@ -34,6 +34,32 @@ alertmanager:
 prometheus-pushgateway:
   enabled: false
 
+extraScrapeConfigs: |
+  - job_name: cloudnative-pg
+    kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - database          # namespace where the pg cluster runs
+    relabel_configs:
+      # keep only CNPG instance pods (they carry the cnpg.io/cluster label)
+      - source_labels: [__meta_kubernetes_pod_label_cnpg_io_cluster]
+        regex: .+
+        action: keep
+      # keep only the metrics port (9187), not the 5432 postgres port
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        regex: "9187"
+        action: keep
+      # tidy labels shown in Grafana
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod
+      - source_labels: [__meta_kubernetes_pod_label_cnpg_io_cluster]
+        target_label: cluster
+      - source_labels: [__meta_kubernetes_pod_label_cnpg_io_instanceRole]
+        target_label: role
+
 # prometheus-node-exporter:
 #   enabled: true
 
